@@ -50,7 +50,7 @@ async function handleSubmit() {
     formData.append("total_items", form.value.total_items);
 
     try {
-        let response = await fetch("http://localhost:8000/pos/add.php", {
+        let response = await fetch("http://localhost:8000/add.php", {
             method: "POST",
             body: formData,
         }).then(() => router.push("/"));

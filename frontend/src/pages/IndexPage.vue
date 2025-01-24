@@ -148,7 +148,7 @@ const exportToCSV = () => {
 };
 
 async function getData() {
-  await fetch("http://localhost:8000/pos/select.php")
+  await fetch("http://localhost:8000/select.php")
     .then((res) => res.json())
     .then((result) => {
       console.log(result.data);
