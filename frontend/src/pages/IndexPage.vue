@@ -1,16 +1,36 @@
 <template>
   <div class="q-pa-md">
-    <q-table @row-click="handleRowClick(evt, rows, index)" class="text-h5 text-capitalize" bordered title="Products"
-      dense :rows="rows" :columns="columns" row-key="name" :grid="$q.screen.lt.sm">
+    <q-table
+      @row-click="handleRowClick(evt, rows, index)"
+      class="text-h5 text-capitalize"
+      bordered
+      title="Products"
+      dense
+      :rows="rows"
+      :columns="columns"
+      row-key="name"
+      :grid="$q.screen.lt.sm"
+    >
       <template v-slot:top-right>
         <div class="flex flex-center">
-          <q-input @update:model-value="handleSearch" outlined dense v-model="filterProduct" debounce="300"
-            placeholder="Search">
+          <q-input
+            @update:model-value="handleSearch"
+            outlined
+            dense
+            v-model="filterProduct"
+            debounce="300"
+            placeholder="Search"
+          >
             <template v-slot:append>
               <q-icon name="search" />
             </template>
           </q-input>
-          <q-btn class="q-ml-sm" label="Export CSV" color="green-8" @click="exportToCSV" />
+          <q-btn
+            class="q-ml-sm"
+            label="Export CSV"
+            color="green-8"
+            @click="exportToCSV"
+          />
         </div>
       </template>
 
@@ -30,8 +50,19 @@
       <template v-slot:body-cell-Action="props">
         <Td>
           <div class="flex flex-center">
-            <q-btn icon="sell" flat class="q-mt-xs" color="green-10" @click.stop="sellItem(props.row)">
-              <q-tooltip class="bg-indigo" anchor="top middle" self="bottom middle" :offset="[10, 10]">
+            <q-btn
+              icon="sell"
+              flat
+              class="q-mt-xs"
+              color="green-10"
+              @click.stop="sellItem(props.row)"
+            >
+              <q-tooltip
+                class="bg-indigo"
+                anchor="top middle"
+                self="bottom middle"
+                :offset="[10, 10]"
+              >
                 <strong class="text-capitalize">{{ props.row.product_name }}</strong>
               </q-tooltip>
             </q-btn>
@@ -48,7 +79,12 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none q-gutter-y-md">
-          <q-input v-model="purchasedPrice" type="number" outlined label="Purchased Price" />
+          <q-input
+            v-model="purchasedPrice"
+            type="number"
+            outlined
+            label="Purchased Price"
+          />
           <q-input v-model="retailPrice" type="number" outlined label="Retail Price" />
         </q-card-section>
 
