@@ -1,12 +1,12 @@
 <template>
   <div class="q-pa-md">
     <q-table
-      @row-click="handleRowClick(evt, rows, index)"
+      @row-click="handleRowClick()"
       class="text-h5 text-capitalize"
       bordered
       title="Products"
       dense
-      :rows="rows"
+      :rows="filterData"
       :columns="columns"
       row-key="name"
       :grid="$q.screen.lt.sm"
@@ -14,10 +14,9 @@
       <template v-slot:top-right>
         <div class="flex flex-center">
           <q-input
-            @update:model-value="handleSearch"
             outlined
             dense
-            v-model="filterProduct"
+            v-model="searchProduct"
             debounce="300"
             placeholder="Search"
           >
@@ -99,11 +98,11 @@
 
 <script setup>
 import { useQuasar } from "quasar";
-import { onMounted } from "vue";
+import { onMounted, computed } from "vue";
 import { ref } from "vue";
 const $q = useQuasar();
 const isRow = ref(false);
-const filterProduct = ref("");
+const searchProduct = ref("");
 function handleRowClick(evt, row, index) {
   console.log(evt, row, index);
 
@@ -200,13 +199,15 @@ async function getData() {
     });
 }
 
-const handleSearch = () => {
-  let filteredData = rows.value.filter((item) =>
-    item.product_name.includes(filterProduct.value)
+let filterData = computed(() => {
+  if (!searchProduct.value.trim()) {
+    return rows.value;
+  }
+  return rows.value.filter((item) =>
+    item.product_name.toLowerCase().includes(searchProduct.value.toLowerCase())
   );
-  console.log(filteredData);
-};
-
+});
+filterData;
 function sellItem(row) {
   console.log("sell item", row);
 }
