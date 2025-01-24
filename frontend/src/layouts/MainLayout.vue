@@ -2,7 +2,15 @@
   <q-layout view="lHh Lpr lFf">
     <q-header class="bg-white text-black">
       <q-toolbar>
-        <q-btn color="black" flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          color="black"
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
 
         <q-toolbar-title> AMS </q-toolbar-title>
 
@@ -15,15 +23,30 @@
 
 </div> -->
         <div class="q-px-md">
-          <q-btn v-if="route.path == '/'" class="text-capitalize text-subtitle2" label="Add Products" color="blue-9"
-            to="/add" />
-          <q-btn v-if="route.path == '/add'" class="text-capitalize text-subtitle2" label="View Products" color="blue-9"
-            to="/" />
+          <q-btn
+            v-if="route.path == '/'"
+            class="text-capitalize text-subtitle2"
+            label="Add Products"
+            color="blue-9"
+            to="/add"
+          />
+          <q-btn
+            v-if="route.path == '/add'"
+            class="text-capitalize text-subtitle2"
+            label="View Products"
+            color="blue-9"
+            to="/"
+          />
         </div>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-primary text-white">
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      class="bg-primary text-white"
+    >
       <q-list>
         <q-item-label header class="text-white"> Point of Sale </q-item-label>
         <q-separator horizontal />
