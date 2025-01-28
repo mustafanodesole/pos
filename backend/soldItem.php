@@ -4,13 +4,12 @@ require 'conn.php';
 
 try {
     //code...
-    $purchased_price = $_POST['purchased_price'];
-    $retail_price = $_POST['retail_price'];
+    $soldItems = $_POST['soldItems'];
     $id = $_POST['id'];
     
    
-    $sql = "UPDATE products SET retail_price = $retail_price , purchased_price = $purchased_price WHERE id = $id";
-    // $sql =  "UPDATE products SET retail_price = 40, purchased_price = 50 WHERE id = 2";
+    $sql = "UPDATE products SET total_items = total_items - $soldItems WHERE id = $id";
+    // $sql = "UPDATE products SET total_items = total_items - 2 WHERE id = 5;";
     
     $stmt = $conn->prepare($sql);
 
@@ -18,10 +17,10 @@ try {
     //    $data =  $conn->prepare("SELECT * FROM products WHERE id = $id")->execute();
     //    $data = $data->fetchAll(PDO::FETCH_ASSOC);
         
-        echo json_encode(["message"=>"Successfully Updated "]);
+        echo json_encode(["message"=>"Successfully Updated total items"]);
     }else{
 
-        echo json_encode(["message" => "Filed to update the "]);
+        echo json_encode(["message" => "Filed to update the total items"]);
     }
 
 } catch (PDOException $e) {

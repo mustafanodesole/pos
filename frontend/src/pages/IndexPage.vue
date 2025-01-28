@@ -1,113 +1,84 @@
 <template>
+  <q-page>
   <div class="q-pa-md">
-    <q-table
-      @row-click="handleRowClick()"
-      class="text-h5 text-capitalize"
-      bordered
-      title="Products"
-      dense
-      :rows="filterData"
-      :columns="columns"
-      row-key="name"
-      :grid="$q.screen.lt.sm"
-    >
+    <q-table @row-click="handleRowClick" class="text-h4 text-capitalize " flat title="Products"
+      dense :rows="filterData" :columns="columns" row-key="name" :grid="$q.screen.lt.sm" :rows-per-page-options="[10, 15 , 20 , 25, 30]">
       <template v-slot:top-right>
         <div class="flex flex-center">
-          <q-input
-            outlined
-            dense
-            v-model="searchProduct"
-            debounce="300"
-            placeholder="Search"
-          >
+          <q-input outlined dense v-model="searchProduct"  debounce="300" placeholder="Search by Name" style="background-color: #F2F5F8;">
             <template v-slot:append>
               <q-icon name="search" />
             </template>
           </q-input>
-          <q-btn
-            class="q-ml-sm"
-            label="Export CSV"
-            color="green-8"
-            @click="exportToCSV"
-          />
+          <q-btn class="q-ml-sm" label="Export CSV"  @click="exportToCSV" color="green-10"/>
         </div>
       </template>
 
-      <!-- Scoped slot for S.No column -->
-      <template v-slot:body-cell-sno="props">
-        <Td>
-          <div class="row items-center justify-center q-mb-md">
-            <div class="col-9 text-body1">
-              {{ props.pageIndex + 1 }}
-              <!-- {{ props.row.id }} -->
-            </div>
-          </div>
-        </Td>
-      </template>
+
 
       <!-- Scoped slot for Action column -->
       <template v-slot:body-cell-Action="props">
         <Td>
-          <div class="flex flex-center">
-            <q-btn
-              icon="sell"
-              flat
-              class="q-mt-xs"
-              color="green-10"
-              @click.stop="sellItem(props.row)"
-            >
-              <q-tooltip
-                class="bg-indigo"
-                anchor="top middle"
-                self="bottom middle"
-                :offset="[10, 10]"
-              >
+          <div class="row items-center justify-center">
+            <q-btn v-if="props.row.isSell" icon="close" flat class="" size="sm"
+              @click.stop="props.row.isSell = false" />
+            <q-input v-if="props.row.isSell" v-model="sellItems" @click.stop type="number" dense outlined class="col-2 "
+              placeholder="No. of Items" />
+            <q-btn v-if="props.row.isSell" flat icon="send_and_archive" color="black"
+              @click.stop="handleSellItems(props.row)" class="col-1" />
+
+            <q-btn v-if="!props.row.isSell" flat icon="sell" color="black" @click.stop="toggleSellInput(props.row)"
+              class="col-6">
+              <q-tooltip class="bg-black" anchor="top middle" self="bottom middle" :offset="[10, 10]">
                 <strong class="text-capitalize">{{ props.row.product_name }}</strong>
               </q-tooltip>
             </q-btn>
           </div>
         </Td>
       </template>
+
+
+
     </q-table>
 
     <q-dialog v-model="isRow" persistent>
       <q-card style="min-width: 350px">
         <q-card-section class="flex justify-between">
-          <div class="text-h6">Panadol</div>
+          <div class="text-h6 text-capitalize">{{ selectedRow?.product_name || "Product Name" }}</div>
           <q-btn icon="close" v-close-popup @click="isRow = false" flat />
         </q-card-section>
 
         <q-card-section class="q-pt-none q-gutter-y-md">
-          <q-input
-            v-model="purchasedPrice"
-            type="number"
-            outlined
-            label="Purchased Price"
-          />
+          <q-input v-model="purchasedPrice" type="number" outlined label="Purchased Price" />
           <q-input v-model="retailPrice" type="number" outlined label="Retail Price" />
         </q-card-section>
 
         <q-card-actions align="right" class="text-primary">
-          <q-btn flat label="Cancel" v-close-popup color="red" />
-          <q-btn label="Update" v-close-popup color="primary" />
+          <q-btn outline label="Cancel" v-close-popup color="red"  />
+          <q-btn label="Update" @click="handleUpdatePrice" v-close-popup color="black" />
         </q-card-actions>
       </q-card>
     </q-dialog>
   </div>
+</q-page>
 </template>
 
 <script setup>
 import { useQuasar } from "quasar";
-import { onMounted, computed } from "vue";
+import {onMounted,  computed } from "vue";
 import { ref } from "vue";
 const $q = useQuasar();
 const isRow = ref(false);
 const searchProduct = ref("");
-function handleRowClick(evt, row, index) {
-  console.log(evt, row, index);
+const sellItems = ref(null)
+const rows = ref([]);
+const sellingId = ref(null)
+const selectedRow = ref(null);
 
-  isRow.value = true;
-}
+const purchasedPrice = ref(null);
+const retailPrice = ref(null);
+
+
 const columns = [
   {
     name: "sno",
@@ -145,14 +116,20 @@ const columns = [
     name: "remaining",
     label: "Remaining",
     field: "remaining",
-    align: "center",
+    align: "right",
     sortable: true,
     sort: (a, b) => parseInt(a, 10) - parseInt(b, 10),
   },
   { name: "Action", align: "center", label: "Sell Item", field: "action" },
 ];
 
-const rows = ref([]);
+
+function handleRowClick(evt, row, index) {
+  console.log(evt, row, index);
+
+  isRow.value = true;
+  selectedRow.value = row
+}
 
 // Export data to CSV
 const exportToCSV = () => {
@@ -204,15 +181,105 @@ let filterData = computed(() => {
     return rows.value;
   }
   return rows.value.filter((item) =>
-    item.product_name.toLowerCase().includes(searchProduct.value.toLowerCase())
+    item.product_name.toLowerCase().includes(searchProduct.value.toLowerCase()) || item.retail_price.includes(searchProduct.value.toLocaleLowerCase())
   );
 });
 filterData;
-function sellItem(row) {
-  console.log("sell item", row);
+
+
+// Toggle sell input for a specific row
+function toggleSellInput(row) {
+  // Toggle `isSell` for the selected row and reset others
+  rows.value.forEach((r) => {
+    r.isSell = r === row ? !r.isSell : false;
+  });
+  sellingId.value = row.sno;
+
 }
+
+
+const handleSellItems = async (row) => {
+  let formData = new FormData();
+  formData.append('soldItems', sellItems.value)
+  formData.append("id", sellingId.value);
+
+  await fetch("http://localhost:8000/soldItem.php", {
+    method: "POST",
+    body: formData
+  }).then( (res) => res).then(async (result) => {
+    console.log(result);
+
+    sellItems.value = null;
+    rows.value.forEach((r) => {
+      r.isSell = r === row ? !r.isSell : false;
+    });
+    $q.notify({ color: "green", message: `Sold Successfully !!` , position : 'top'});
+    // const soldItemsValue = parseInt(sellItems.value, 10);
+    // if (!isNaN(soldItemsValue)) {
+    //   row.remaining -= soldItemsValue; // Adjust the remaining count
+    // }
+  }).catch(error => {
+
+    console.log(error)
+    $q.notify({ color: "red", message: `Failed !! ` , position : 'top'});
+  }).then(() => {
+    setTimeout(() => {
+
+      window.location.reload();
+    } , 1000)
+
+  });
+
+
+
+}
+
+
+
+const handleUpdatePrice = async () => {
+  if (!selectedRow.value) return;
+
+  const formData = new FormData();
+  formData.append("id", selectedRow.value.sno); // Pass the row ID
+  formData.append("purchased_price", purchasedPrice.value);
+  formData.append("retail_price", retailPrice.value);
+
+  try {
+    const response = await fetch("http://localhost:8000/update.php", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update price");
+    }
+
+    // Update the row data locally
+    selectedRow.value.purchased_price = `Rs. ${purchasedPrice.value} /-`;
+    selectedRow.value.retail_price = `Rs. ${retailPrice.value} /-`;
+
+    $q.notify({ color: "green", message: "Price updated successfully!", position: "top" });
+  } catch (error) {
+    console.error(error);
+    $q.notify({ color: "red", message: "Failed to update price!", position: "top" });
+  } finally {
+    isRow.value = false; // Close the modal
+
+
+  }
+};
 
 onMounted(async () => {
   await getData();
 });
+
+
 </script>
+
+
+
+<style scoped>
+   tbody, tr , td{
+    font-size: 50px;
+  }
+</style>
