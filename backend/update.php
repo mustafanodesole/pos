@@ -4,12 +4,13 @@ require 'conn.php';
 
 try {
     //code...
+    $total_items = $_POST['total_items'];
     $purchased_price = $_POST['purchased_price'];
     $retail_price = $_POST['retail_price'];
     $id = $_POST['id'];
     
    
-    $sql = "UPDATE products SET retail_price = $retail_price , purchased_price = $purchased_price WHERE id = $id";
+    $sql = "UPDATE products SET retail_price = $retail_price , purchased_price = $purchased_price , total_items = total_items + $total_items WHERE id = $id";
     // $sql =  "UPDATE products SET retail_price = 40, purchased_price = 50 WHERE id = 2";
     
     $stmt = $conn->prepare($sql);
